@@ -6,6 +6,7 @@
 	<property name="build" value="build"/>
 	<property name="apidocs" value="apidocs"/>
 	<property name="MainJar" value="me2api-java.jar"/>
+	<property name="dist" value="dist"/>
 
 	<target name="compile">
 		<mkdir dir="${build}"/>
@@ -37,9 +38,20 @@
 		</jar>
 	</target>
 
+	<target name="dist" depends="build">
+		<mkdir dir="${dist}"/>
+		<tar tarfile="${dist}/me2api-java-src.tar"
+			basedir="."
+			excludes="**/.svn/**, test.*, build, build/**, dist, dist/**"/>
+		<gzip src="${dist}/me2api-java-src.tar"
+			zipfile="${dist}/me2api-java-src.tar.gz"/>
+		<delete file="${dist}/me2api-java-src.tar"/>
+	</target>
+
 	<target name="clean">
 		<delete dir="${build}"/>
 		<delete file="${MainJar}"/>
+		<delete dir="${dist}"/>
 	</target>
 
 </project>
