@@ -265,7 +265,7 @@ public class Me2API
 				bos.write(buf, 0, readlen);	
 			}
 			String output = new String(bos.toByteArray(), "UTF-8");
-			System.out.println(output);
+			//System.out.println(output);
 
 			this.lastResult = output;
 			try
