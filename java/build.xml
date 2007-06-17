@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<project name="Me2Day Java API" default="build">
+
+	<property name="src" value="src"/>
+	<property name="build" value="build"/>
+	<property name="apidocs" value="apidocs"/>
+	<property name="MainJar" value="me2api-java.jar"/>
+
+	<target name="compile">
+		<mkdir dir="${build}"/>
+		<javac srcdir="${src}" destdir="${build}"
+			encoding="utf-8"
+			debug="yes"
+			source="1.5" target="1.5">
+			<classpath>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="javadoc" depends="compile">
+		<mkdir dir="${apidocs}"/>
+		<javadoc sourcepath="${src}"
+			encoding="utf-8"
+			docencoding="utf-8"
+			packagenames="net.me2day.java.*"
+			destdir="${apidocs}"
+			link="http://java.sun.com/j2se/1.5.0/docs/api"
+			splitindex="yes">
+		</javadoc>
+	</target>
+
+	<target name="build" depends="compile">
+		<jar jarfile="${MainJar}"
+			basedir="${build}"
+			compress="yes">
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete file="${MainJar}"/>
+	</target>
+
+</project>
