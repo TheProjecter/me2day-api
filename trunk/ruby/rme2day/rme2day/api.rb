@@ -13,12 +13,14 @@ module Rme2day
 	    end
 
 	    def set_credential(me2day_id, user_key, app_key, encoding = :utf8 )
-	       @@config = {
-	           'me2day_id' => me2day_id,
+		@@config = {
+		   'me2day_id' => me2day_id,
 		   'user_key' => user_key,
-	           'app_key' => app_key,
+		   'app_key' => app_key,
 		   'encoding' => encoding
-	       }
+		}
+		@@username = nil
+		@@password = nil
 	    end
 
             def config
