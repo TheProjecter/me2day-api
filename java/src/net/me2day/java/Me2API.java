@@ -25,8 +25,6 @@ import net.me2day.java.util.BASE64;
  * 미투데이(http://me2day.net)에 글을 포스트할 수 있게 간단히 wrapping 한
  * 클래스입니다.
  * <p>
- * 지금(2007-04-07)은 <b>새로운 글 포스트</b> 밖에 지원하지 않습니다.
- * <p>
  * 자세한 사항은 <a href="http://codian.springnote.com/pages/86001">codian님의 스프링노트</a>를 보시기 바랍니다.
  * <p>
  * 간단한 사용 예는 다음과 같습니다.
@@ -34,7 +32,7 @@ import net.me2day.java.util.BASE64;
  * Me2API me2 = new Me2API();
  * me2.setUsername("rath");
  * me2.setUserKey("00112233"); 
- * me2.setApplicationKey("1"); // <i>아직은 발급 절차가 만들어지지 않았습니다.</i>
+ * me2.setApplicationKey("000000000000"); 
  * me2.post("아무리 할 일이 많아도 여유를 잃은 삶 따위는 살지 않으리.", "*활짝*", KIND_THINK);
  * </font></pre>
  * @author Jang-Ho Hwang, rath@ncsoft.net
@@ -54,6 +52,7 @@ public class Me2API
 	private String username;
 	private String userKey;
 	private String appKey;
+	private boolean subscribeSMS = false;
 
 	private DocumentBuilder docBuilder;
 	private String lastResult = null;
@@ -77,6 +76,22 @@ public class Me2API
 	public String getUsername()
 	{
 		return this.username;
+	}
+
+	/**
+	 * 새 포스트 작성시 댓글수신 알람 SMS를 받을 것인지 말 것인지 설정한다. 
+	 */
+	public void setSubscribeSMS( boolean use )
+	{
+		this.subscribeSMS = use;	
+	}
+
+	/**
+	 * 새 포스트 작성시 댓글을 수신받도록 설정한 결과를 가져온다.
+	 */
+	public boolean getSubscribeSMS()
+	{
+		return this.subscribeSMS;
 	}
 
 	/**
@@ -192,14 +207,17 @@ public class Me2API
 			throw new IllegalStateException("username cannot be null");
 		if( userKey==null )
 			throw new IllegalStateException("userKey cannot be null");
+		/*
 		if( appKey==null )
 			throw new IllegalStateException("appKey cannot be null");
+		*/
 		
 		URL url = new URL( "http://me2day.net/api/create_post" );
 		Map<String, String> params = new HashMap<String, String>();
 		params.put( "post[body]", msg );
 		params.put( "post[tags]", tags );
 		params.put( "post[kind]", String.valueOf(kind) );
+		params.put( "receive_sms", String.valueOf(subscribeSMS) );
 
 		request(url, "POST", params);
 	}
@@ -231,13 +249,20 @@ public class Me2API
 		throws IOException
 	{
 		Document ret = null;
-		String authKey = String.format("Basic %s", 
-			new BASE64(false).encode(username + ":" + createPassword()));
+		
 
 		HttpURLConnection con = (HttpURLConnection)url.openConnection();
 		con.setRequestMethod(method);
-		con.setRequestProperty("Authorization", authKey);
-		con.setRequestProperty("me2_application_key", this.appKey);
+
+		if( this.userKey!=null )
+		{
+			String authKey = String.format("Basic %s", 
+				new BASE64(false).encode(username + ":" + createPassword()));
+			con.setRequestProperty("Authorization", authKey);
+		}
+
+		if( this.appKey!=null )
+			con.setRequestProperty("me2_application_key", this.appKey);
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		con.setDoInput(true);
 		
@@ -361,11 +386,26 @@ public class Me2API
 
 	/**
 	 * 주어진 미투데이 사용자의 친구 목록을 가져온다.
+	 * 
+	 * @param username 조회하고자하는 미투데이 아이디
 	 */
 	public List<Person> getFriends( String username ) throws IOException
 	{
+		return getFriends(username, "all");
+	}
+
+	/**
+	 * 주어진 미투데이 사용자의 친구 목록을 그룹별로 가져옵니다.
+	 *
+	 * @param username 조회하고자하는 미투데이 아이디
+	 * @param scope all(모든친구), close(친한친구), family(직계존속), mytag[n](마이태그)
+	 */
+	public List<Person> getFriends( String username, String scope ) throws IOException
+	{
 		URL url = new URL(String.format("http://me2day.net/api/get_friends/%s.xml",username));
-		Document doc = request(url, "GET", null);
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("scope", scope);
+		Document doc = request(url, "POST", params);
 
 		List<Person> ret = new ArrayList<Person>();
 		NodeList nl = doc.getElementsByTagName("person");
@@ -394,6 +434,53 @@ public class Me2API
 			Person p = createPersonFromElement(e);
 			ret.put( p.getId(), p );
 		}
+		return ret;
+	}
+
+	/**
+	 * 주어진 미투데이 사용자가 최근 작성한 글(3개)를 가져온다. 
+	 * <p>
+	 * Post와 Post가 같은지를 확인하려면, permalink / commentsCount / metooCount 를 
+	 * AND 조합으로 확인해야한다. 
+	 */
+	public List<Post> getLatest( String username ) throws IOException
+	{
+		URL url = new URL(String.format("http://me2day.net/api/get_latests/%s.xml", username));
+		Document doc = request(url, "GET", null);
+
+		List<Post> ret = new ArrayList<Post>();
+		NodeList nl = doc.getElementsByTagName("post");
+		for(int i=0; i<nl.getLength(); i++)
+		{
+			Element e = (Element)nl.item(i);
+			Post post = new Post();
+			post.setPermalink( new URL(getTextAsName(e, "permalink")) );
+			post.setBody( getTextAsName(e, "body") );
+			post.setKind( getTextAsName(e, "kind") );
+			post.setIcon( new URL(getTextAsName(e, "icon")) );
+			try
+			{
+				post.setPubDate( fmtDate.parse(getTextAsName(e, "pubDate")) );
+			}
+			catch( ParseException ex ) {}
+			post.setCommentsCount( 
+				Integer.parseInt(getTextAsName(e, "commentsCount")) );
+			post.setMetooCount(
+				Integer.parseInt(getTextAsName(e, "metooCount")) );
+			
+			NodeList tags = e.getElementsByTagName("tag");
+			for(int j=0; j<tags.getLength(); j++)
+			{
+				Element eTag = (Element)tags.item(j);
+				post.addTag( getTextAsName(eTag, "name") );
+			}
+
+			Element author = (Element)e.getElementsByTagName("author").item(0);
+			post.setUsername( getTextAsName(author, "id") );
+
+			ret.add(post);
+		}
+
 		return ret;
 	}
 
@@ -477,7 +564,9 @@ public class Me2API
 		ret.setOpenId( new URL(getTextAsName(e, "openid")) );
 		ret.setNickname( getTextAsName(e, "nickname") );
 		ret.setFace( new URL(getTextAsName(e, "face")) );
-		ret.setHomepage( new URL(getTextAsName(e, "homepage")) );
+		String homepage = getTextAsName(e, "homepage");
+		if( homepage!=null && homepage.startsWith("http://") )
+			ret.setHomepage( new URL(homepage) );
 		ret.setDescription( getTextAsName(e, "description") );
 		ret.setRSSDaily( new URL(getTextAsName(e, "rssDaily")) );
 		ret.setParentId( getTextAsName(e, "invitedBy") );
