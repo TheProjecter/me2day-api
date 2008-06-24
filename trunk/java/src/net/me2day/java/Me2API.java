@@ -112,8 +112,9 @@ public class Me2API
 	}
 
 	/**
-	 * me2API 어플리케이션 키를 설정합니다. 지금은 별도의 발급 프로세스가 없으므로,
-	 * 아무거나 입력하셔서 테스트 하실 수 있으며, 추후 재공지 하겠습니다. :)
+	 * me2API 어플리케이션 키를 설정합니다. 
+	 * <a href="http://me2day.net/api/front/appkey">http://me2day.net/api/front/appkey</a>에서 
+	 * 신청하면 메일로 받을 수 있습니다.
 	 */
 	public void setApplicationKey( String appKey )
 	{
