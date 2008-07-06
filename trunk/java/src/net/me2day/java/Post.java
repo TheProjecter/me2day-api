@@ -14,12 +14,14 @@ import java.util.Date;
  */
 public class Post implements Serializable
 {
+	private String id;
 	private String username;
 	private URL permalink;
 	private String body;
 	private Date pubDate;
 	private String kind;
 	private URL icon;
+	private Person author;
 
 	private int commentsCount;
 	private int metooCount;
@@ -32,6 +34,16 @@ public class Post implements Serializable
 	public Post()
 	{
 
+	}
+
+	public void setId( String id )
+	{
+		this.id = id;
+	}
+
+	public String getId()
+	{
+		return this.id;
 	}
 
 	public void setUsername( String id )
@@ -161,5 +173,15 @@ public class Post implements Serializable
 	public List<String> getTagList()
 	{
 		return this.tags;
+	}
+
+	public void setAuthor( Person author )
+	{
+		this.author = author;
+	}
+
+	public Person getAuthor()
+	{
+		return this.author;
 	}
 }
