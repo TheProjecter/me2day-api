@@ -33,16 +33,16 @@ import net.me2day.java.util.BASE64;
  * me2.setUsername("rath");
  * me2.setUserKey("00112233"); 
  * me2.setApplicationKey("000000000000"); 
- * me2.post("아무리 할 일이 많아도 여유를 잃은 삶 따위는 살지 않으리.", "*활짝*", KIND_THINK);
+ * me2.post("아무리 할 일이 많아도 여유를 잃은 삶 따위는 살지 않으리.", "*활짝*", ICON_THINK);
  * </font></pre>
  * @author Jang-Ho Hwang, rath@ncsoft.net
  * @version 1.0, $Id$ since 2007/04/07
  */
 public class Me2API
 {
-	public static final int KIND_THINK = 1;
-	public static final int KIND_FEELING = 2;
-	public static final int KIND_NOTICE = 3;
+	public static final int ICON_THINK = 1;
+	public static final int ICON_FEELING = 2;
+	public static final int ICON_NOTICE = 3;
 
 	private static final SimpleDateFormat fmtDate = 
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -161,7 +161,7 @@ public class Me2API
 	public void post( String msg )
 		throws IOException
 	{
-		post( msg, "", KIND_THINK );
+		post( msg, "", ICON_THINK );
 	}
 
 	/**
@@ -169,12 +169,12 @@ public class Me2API
 	 * 이 메서드를 사용할 경우 태그는 붙지 않습니다.
 	 *
 	 * @param msg - 남기고자 하는 글.
-	 * @param kind - KIND_THINK, KIND_FEELING, KIND_NOTICE 중에 하나.
+	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
 	 */ 
-	public void post( String msg, int kind )
+	public void post( String msg, int icon )
 		throws IOException
 	{
-		post( msg, "", kind );
+		post( msg, "", icon );
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class Me2API
 	public void post( String msg, String tags )
 		throws IOException
 	{
-		post( msg, tags, KIND_THINK );
+		post( msg, tags, ICON_THINK );
 	}
 
 	/**
@@ -196,13 +196,30 @@ public class Me2API
 	 *
 	 * @param msg - 남기고자 하는 글.
 	 * @param tags - 태그. 태그가 여러개일 경우 공백으로 구분해 넣어야 함.
-	 * @param kind - KIND_THINK, KIND_FEELING, KIND_NOTICE 중에 하나.
+	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
 	 */ 
-	public void post( String msg, String tags, int kind )
+	public void post( String msg, String tags, int icon )
 		throws IOException
 	{
-		// 150자 길이체크는 나중에 넣자. URL 체크하기 귀찮다 -_-
-		if( kind < 1 || kind > 3 )
+		Map<String, String> param = new HashMap<String, String>();
+		post(msg, tags, icon, param);
+	}
+
+	/**
+	 * 자신의 미투데이에 새로운 글을 포스트합니다. 
+	 * 이 메서드를 사용할 경우 분류 아이콘은 '생각'이 됩니다.
+	 *
+	 * @param msg - 남기고자 하는 글.
+	 * @param tags - 태그. 태그가 여러개일 경우 공백으로 구분해 넣어야 함.
+	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
+	 */ 
+	public void post( String msg, String tags, int icon, Map<String, String> param )
+		throws IOException
+	{
+		if( msg.length() > 150 )
+			throw new IllegalArgumentException("message.length must less than 150");
+
+		if( icon < 1 || icon > 3 )
 			throw new IllegalArgumentException( "Kind must be between 1 and 3");
 		if( username==null )
 			throw new IllegalStateException("username cannot be null");
@@ -217,8 +234,9 @@ public class Me2API
 		Map<String, String> params = new HashMap<String, String>();
 		params.put( "post[body]", msg );
 		params.put( "post[tags]", tags );
-		params.put( "post[kind]", String.valueOf(kind) );
+		params.put( "post[icon]", String.valueOf(icon) );
 		params.put( "receive_sms", String.valueOf(subscribeSMS) );
+		params.putAll(param);
 
 		request(url, "POST", params);
 	}
@@ -244,7 +262,7 @@ public class Me2API
 	}
 
 	/**
-	 * 문서화 할 이유가 없습니다. -.-
+	 * INTERNAL USE ONLY
 	 */
 	protected Document request( URL url, String method, Map<String, String> params )
 		throws IOException
@@ -439,6 +457,18 @@ public class Me2API
 	}
 
 	/**
+	 * 주어진 commentId를 가지는 댓글을 삭제합니다. 사용자 인증이 필요합니다.
+	 *
+	 * @param commentId get_comments 에서 반환된 댓글을 지정하는 아이디 입니다.
+	 */
+	public void deleteComment( String commentId ) throws IOException
+	{
+		URL url = new URL(String.format("http://me2day.net/api/delete_comment.xml?comment_id=%s", commentId));
+
+		request(url, "GET", null);
+	}
+
+	/**
 	 * 주어진 미투데이 사용자가 최근 작성한 글(3개)를 가져온다. 
 	 * <p>
 	 * Post와 Post가 같은지를 확인하려면, permalink / commentsCount / metooCount 를 
@@ -455,6 +485,7 @@ public class Me2API
 		{
 			Element e = (Element)nl.item(i);
 			Post post = new Post();
+			post.setId( getTextAsName(e, "post_id") );
 			post.setPermalink( new URL(getTextAsName(e, "permalink")) );
 			post.setBody( getTextAsName(e, "body") );
 			post.setKind( getTextAsName(e, "kind") );
@@ -486,6 +517,169 @@ public class Me2API
 	}
 
 	/**
+	 * 주어진 post에 metoo 한 사람들의 목록을 가져온다.
+	 *
+	 * @param postId post_id.
+	 */
+	public List<Metoo> getMetoos( String postId ) throws IOException
+	{
+		URL url = new URL(String.format("http://me2day.net/api/get_metoos.xml?post_id=%s", postId));
+
+		Document doc = request(url, "GET", null);
+
+		List<Metoo> ret = new ArrayList<Metoo>();
+		NodeList nl = doc.getElementsByTagName("metoo");
+		for(int i=0; i<nl.getLength(); i++)
+		{
+			Element e = (Element)nl.item(i);
+
+			Metoo m = new Metoo();
+			String date = getTextAsName(e, "pubDate");
+			try
+			{
+				m.setPubDate( fmtDate.parse(date) );
+			}
+			catch( ParseException ex ) {}
+
+			Person author = new Person();
+			author.setId( getTextAsName(e, "id") );
+			author.setNickname( getTextAsName(e, "nickname") );
+			author.setFace( new URL(getTextAsName(e, "face")) );
+			m.setAuthor( author );
+
+			ret.add(m);
+		}
+
+		return ret;
+	}
+
+	/**
+	 * 주어진 post_id와 관련된 포스트에 metoo를 한다.
+	 * 상세한 정보는 <a href="http://codian.springnote.com/pages/404723">track_comments</a> 문서를 참조하라.
+	 *
+	 * @param post_id post_id.
+	 */
+	public void metoo( String post_id ) throws IOException
+	{
+		URL url = new URL("http://me2day.net/api/metoo.xml");
+		HashMap<String, String> param = new HashMap<String,String>();
+		param.put("post_id", post_id);
+
+		Document doc = request(url, "POST", param);
+	}
+
+	/**
+	 * 주어진 userid가 최근에 작성한 댓글을 count 만큼 가져온다.
+	 * 상세한 정보는 <a href="http://codian.springnote.com/pages/404723">track_comments</a> 문서를 참조하라.
+	 *
+	 * @param userid 미투데이 아이디
+	 * @param count 가져올 댓글 개수
+	 */
+	public List<TrackComment> getCommentsByMe( String userid, int count ) 
+		throws IOException
+	{
+		URL url = new URL(String.format("http://me2day.net/api/track_comments/%s.xml", userid));
+		HashMap<String, String> param = new HashMap<String,String>();
+		param.put("scope", "by_me");
+		param.put("count", String.valueOf(count));
+
+		Document doc = request(url, "POST", param);
+
+		List<TrackComment> ret = new ArrayList<TrackComment>(count);
+		NodeList nl = doc.getElementsByTagName("commentByMe");
+		for(int i=0; i<nl.getLength(); i++)
+		{
+			Element e = (Element)nl.item(i);
+
+			Element ep = (Element)e.getElementsByTagName("post").item(0);
+			Element ec = (Element)e.getElementsByTagName("comment").item(0);
+
+			String date = null;
+
+			Post post = new Post();
+			post.setId( getTextAsName(ep, "post_id") );
+			post.setPermalink( new URL(getTextAsName(ep, "permalink")) );
+			post.setBody( getTextAsName(ep, "body") );
+			date = getTextAsName(ep, "pubDate");
+			try {
+				post.setPubDate( fmtDate.parse(date) );
+			} catch( ParseException ex ) {}
+
+			Comment comment = new Comment();
+			comment.setBody( getTextAsName(ec, "body") );
+			date = getTextAsName(ec, "pubDate");
+			try {
+				comment.setPubDate( fmtDate.parse(date) );
+			} catch( ParseException ex ) {}
+
+			Person author = new Person();
+			author.setId( getTextAsName(ec, "id") );
+			author.setNickname( getTextAsName(ec, "nickname") );
+			comment.setAuthor(author);
+
+			TrackComment tc = new TrackComment();
+			tc.setPost( post );
+			tc.setComment( comment );
+
+			ret.add(tc);
+		}
+		return ret;
+	}
+
+	/**
+	 * 주어진 userid가 최근에 받은 댓글을 count 만큼 가져온다.
+	 *
+	 * @param userid 미투데이 아이디
+	 * @param count 가져올 댓글 개수
+	 */
+	public List<TrackComment> getCommentsToMe( String userid, int count ) 
+		throws IOException
+	{
+		URL url = new URL(String.format("http://me2day.net/api/track_comments/%s.xml", userid));
+		HashMap<String, String> param = new HashMap<String,String>();
+		param.put("scope", "to_me");
+		param.put("count", String.valueOf(count));
+
+		Document doc = request(url, "POST", param);
+
+		List<TrackComment> ret = new ArrayList<TrackComment>(count);
+		NodeList nl = doc.getElementsByTagName("commentToMe");
+		for(int i=0; i<nl.getLength(); i++)
+		{
+			Element e = (Element)nl.item(i);
+
+			Element ep = (Element)e.getElementsByTagName("post").item(0);
+			Element ec = (Element)e.getElementsByTagName("comment").item(0);
+
+			String date = null;
+
+			Post post = new Post();
+			post.setId( getTextAsName(ep, "post_id") );
+			post.setPermalink( new URL(getTextAsName(ep, "permalink")) );
+			post.setBody( getTextAsName(ep, "body") );
+			date = getTextAsName(ep, "pubDate");
+			try {
+				post.setPubDate( fmtDate.parse(date) );
+			} catch( ParseException ex ) {}
+
+				
+			Comment comment = new Comment();
+			comment.setBody( getTextAsName(ec, "body") );
+			date = getTextAsName(ec, "pubDate");
+			try {
+				comment.setPubDate( fmtDate.parse(date) );
+			} catch( ParseException ex ) {}
+
+			TrackComment tc = new TrackComment();
+			tc.setPost( post );
+			tc.setComment( comment );
+
+			ret.add(tc);
+		}
+		return ret;
+	}
+
+	/**
 	 * 주어진 글(퍼머링크)에 달려있는 댓글들을 모두 가져온다.
 	 */
 	public List<Comment> getComments( String permalink ) throws IOException
@@ -503,13 +697,12 @@ public class Me2API
 			Element e = (Element)nl.item(i);
 
 			Comment comment = new Comment();
+			comment.setId( getTextAsName(e, "commentId") );
 			comment.setBody( getTextAsName(e, "body") );
 			String date = getTextAsName(e, "pubDate");
-			try
-			{
+			try {
 				comment.setPubDate( fmtDate.parse(date) );
-			}
-			catch( ParseException ex ) {}
+			} catch( ParseException ex ) {}
 
 			Element ea = (Element)e.getElementsByTagName("author").item(0);
 			Person author = new Person();

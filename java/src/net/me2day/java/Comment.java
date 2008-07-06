@@ -9,6 +9,7 @@ import java.util.Date;
  */
 public class Comment implements Serializable
 {
+	private String id;
 	private String body;
 	private Date pubDate;
 	private Person author;
@@ -16,6 +17,16 @@ public class Comment implements Serializable
 	public Comment()
 	{
 
+	}
+
+	public void setId( String id )
+	{
+		this.id = id;
+	}
+
+	public String getId()
+	{
+		return this.id;
 	}
 
 	public void setBody( String body )
