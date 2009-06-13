@@ -5,22 +5,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.security.MessageDigest;
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.*;
-import org.xml.sax.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import net.me2day.java.util.BASE64;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 /**
  * 미투데이(http://me2day.net)에 글을 포스트할 수 있게 간단히 wrapping 한
  * 클래스입니다.
@@ -158,10 +170,10 @@ public class Me2API
 	 * 
 	 * @param msg - 남기고자 하는 글.
 	 */ 
-	public void post( String msg )
+	public String post( String msg )
 		throws IOException
 	{
-		post( msg, "", ICON_THINK );
+		return post( msg, "", ICON_THINK );
 	}
 
 	/**
@@ -171,10 +183,10 @@ public class Me2API
 	 * @param msg - 남기고자 하는 글.
 	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
 	 */ 
-	public void post( String msg, int icon )
+	public String post( String msg, int icon )
 		throws IOException
 	{
-		post( msg, "", icon );
+		return post( msg, "", icon );
 	}
 
 	/**
@@ -184,10 +196,10 @@ public class Me2API
 	 * @param msg - 남기고자 하는 글.
 	 * @param tags - 태그. 태그가 여러개일 경우 공백으로 구분해 넣어야 함.
 	 */ 
-	public void post( String msg, String tags )
+	public String post( String msg, String tags )
 		throws IOException
 	{
-		post( msg, tags, ICON_THINK );
+		return post( msg, tags, ICON_THINK );
 	}
 
 	/**
@@ -198,11 +210,11 @@ public class Me2API
 	 * @param tags - 태그. 태그가 여러개일 경우 공백으로 구분해 넣어야 함.
 	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
 	 */ 
-	public void post( String msg, String tags, int icon )
+	public String post( String msg, String tags, int icon )
 		throws IOException
 	{
 		Map<String, String> param = new HashMap<String, String>();
-		post(msg, tags, icon, param);
+		return post(msg, tags, icon, param);
 	}
 
 	/**
@@ -213,14 +225,14 @@ public class Me2API
 	 * @param tags - 태그. 태그가 여러개일 경우 공백으로 구분해 넣어야 함.
 	 * @param icon - ICON_THINK, ICON_FEELING, ICON_NOTICE 중에 하나.
 	 */ 
-	public void post( String msg, String tags, int icon, Map<String, String> param )
+	public String post( String msg, String tags, int icon, Map<String, String> param )
 		throws IOException
 	{
 		if( msg.length() > 150 )
 			throw new IllegalArgumentException("message.length must less than 150");
 
-		if( icon < 1 || icon > 3 )
-			throw new IllegalArgumentException( "Kind must be between 1 and 3");
+		if( icon < 1 || icon > 12 )
+			throw new IllegalArgumentException( "Kind must be between 1 and 12");
 		if( username==null )
 			throw new IllegalStateException("username cannot be null");
 		if( userKey==null )
@@ -238,7 +250,13 @@ public class Me2API
 		params.put( "receive_sms", String.valueOf(subscribeSMS) );
 		params.putAll(param);
 
-		request(url, "POST", params);
+		Document doc = request(url, "POST", params);
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		String permalink = null;
+		try {
+			permalink = xpath.evaluate("/post/permalink/text()", doc);
+		} catch (XPathExpressionException e) {}
+		return permalink;
 	}
 
 	private String createPassword()
