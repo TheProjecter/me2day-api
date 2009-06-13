@@ -4,11 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 /**
  *
- * @author Jang-Ho Hwang, rath@ncsoft.net
- * @version 1.0, $Id$ since 2007/06/17
+ * @author Jang-Ho Hwang, rath@xrath.com
+ * @version 1.0
  */
 public class Comment implements Serializable
 {
+	private static final long serialVersionUID = -1461352834498546885L;
 	private String id;
 	private String body;
 	private Date pubDate;

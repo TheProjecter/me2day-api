@@ -2,8 +2,14 @@ package net.me2day.java;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * @author Jang-Ho Hwang, rath@xrath.com
+ */
 public class TrackComment implements Serializable
-{
+{	
+	private static final long serialVersionUID = -8876156197228804187L;
+	
 	private Post post;
 	private Comment comment;
 
