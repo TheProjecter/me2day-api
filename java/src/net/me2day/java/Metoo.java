@@ -5,11 +5,12 @@ import java.util.Date;
 /**
  * 
  *
- * @author Jang-Ho Hwang, rath@ncsoft.net
- * @version 1.0, $Id$ since 2008/07/07
+ * @author Jang-Ho Hwang, rath@xrath.com 
  */
 public class Metoo implements Serializable
 {
+	private static final long serialVersionUID = 4495373535109985874L;
+	
 	private Date pubDate;
 	private Person author;
 

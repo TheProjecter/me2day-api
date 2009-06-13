@@ -47,8 +47,8 @@ import org.xml.sax.SAXException;
  * me2.setApplicationKey("000000000000"); 
  * me2.post("아무리 할 일이 많아도 여유를 잃은 삶 따위는 살지 않으리.", "*활짝*", ICON_THINK);
  * </font></pre>
- * @author Jang-Ho Hwang, rath@ncsoft.net
- * @version 1.0, $Id$ since 2007/04/07
+ * 
+ * @author Jang-Ho Hwang, rath@xrath.com 
  */
 public class Me2API
 {
@@ -228,8 +228,9 @@ public class Me2API
 	public String post( String msg, String tags, int icon, Map<String, String> param )
 		throws IOException
 	{
-		if( msg.length() > 150 )
-			throw new IllegalArgumentException("message.length must less than 150");
+		// 
+//		if( msg.length() > 150 )
+//			throw new IllegalArgumentException("message.length must less than 150");
 
 		if( icon < 1 || icon > 12 )
 			throw new IllegalArgumentException( "Kind must be between 1 and 12");
@@ -374,7 +375,7 @@ public class Me2API
 		throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
-		for(Iterator i= params.keySet().iterator(); i.hasNext(); )
+		for(Iterator<String> i= params.keySet().iterator(); i.hasNext(); )
 		{
 			String key = (String)i.next();
 			sb.append( key );
@@ -583,6 +584,7 @@ public class Me2API
 		HashMap<String, String> param = new HashMap<String,String>();
 		param.put("post_id", post_id);
 
+		@SuppressWarnings("unused")
 		Document doc = request(url, "POST", param);
 	}
 
@@ -746,8 +748,8 @@ public class Me2API
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("post_id", permalink);
 		params.put("body", body);
-
-		Document doc = request(url, "POST", params);
+		
+		request(url, "POST", params);
 	}
 
 	/**

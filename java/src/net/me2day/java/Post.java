@@ -9,11 +9,14 @@ import java.util.Date;
 /**
  * 미투 포스트(글)을 나타내는 클래스이다.
  *
- * @author Jang-Ho Hwang, rath@ncsoft.net
- * @version 1.0, $Id$ since 2007/06/18
+ * @author Jang-Ho Hwang, rath@xrath.com 
  */
 public class Post implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8074072040556134252L;
 	private String id;
 	private String username;
 	private URL permalink;

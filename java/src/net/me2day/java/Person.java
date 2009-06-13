@@ -5,11 +5,12 @@ import java.net.URL;
 /**
  * 미투데이 이용자를 나타내는 클래스이다.
  *
- * @author Jang-Ho Hwang, rath@ncsoft.net
- * @version 1.0, $Id$ since 2007/06/17
+ * @author Jang-Ho Hwang, rath@xrath.com 
  */
 public class Person implements Serializable
 {
+	private static final long serialVersionUID = 8999736931097933667L;
+	
 	private String id;
 	private URL openid;
 	private String nickname;
