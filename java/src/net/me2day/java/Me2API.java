@@ -196,7 +196,7 @@ public class Me2API {
 	 *
 	 */
 	public String post(Post post) throws IOException {
-		if (post.getBody().length() > 150)
+		if (post.getLength() > 150)
 			throw new IllegalArgumentException("message.length must less than 150");
 		if (post.getIconIndex() < 1 || post.getIconIndex() > 12)
 			throw new IllegalArgumentException("icon must be between 1 and 12");
