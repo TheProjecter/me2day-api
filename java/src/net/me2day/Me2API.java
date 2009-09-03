@@ -860,7 +860,9 @@ public class Me2API {
 		Person ret = new Person();
 
 		ret.setId(getTextAsName(e, "id"));
-		ret.setOpenId(new URL(getTextAsName(e, "openid")));
+		String openId = getTextAsName(e, "openid");
+		if( openId!=null && openId.startsWith("http") )
+			ret.setOpenId(new URL(openId));
 		ret.setNickname(getTextAsName(e, "nickname"));
 		ret.setFace(new URL(getTextAsName(e, "face")));
 		String homepage = getTextAsName(e, "homepage");

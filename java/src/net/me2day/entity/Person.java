@@ -201,7 +201,6 @@ public class Person implements Serializable, GWTFriendly
 		return postIcons;
 	}
 
-	@Override
 	public Object toGWT() {
 		net.me2day.gwt.client.Person ret = new net.me2day.gwt.client.Person();
 		ret.setDescription(this.description);
@@ -210,7 +209,8 @@ public class Person implements Serializable, GWTFriendly
 		ret.setHomepage(this.homepage.toString());
 		ret.setId(this.id);
 		ret.setNickname(this.nickname);
-		ret.setOpenId(this.openid.toString());
+		if( this.openid!=null ) 
+			ret.setOpenId(this.openid.toString());
 		ret.setParentId(this.parentId);
 		ret.setRSSDaily(this.rssDaily.toString());
 		
