@@ -14,12 +14,12 @@ import net.me2day.java.event.ProgressListener;
  */
 public class VirtualFile {
 	
-	private File file;
-	private InputStream stream;
+	private transient File file;
+	private transient InputStream stream;
 	
 	private String name;
 	private long length;
-	private ProgressListener listener;
+	private transient ProgressListener listener;
 	
 	private VirtualFile() {
 		

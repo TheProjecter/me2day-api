@@ -1,15 +1,18 @@
-package net.me2day.java;
+package net.me2day.java.gwt.client;
 
 import java.io.Serializable;
-import java.net.URL;
 
 public class Icon implements Serializable {
-	private static final long serialVersionUID = -767861645667681261L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5416905108707501939L;
 	
 	private int index;
 	private int type;
-	private URL url;
+	private String url;
 	private boolean isDefault;
+	private String description;
 	
 	public Icon() {
 		
@@ -35,12 +38,12 @@ public class Icon implements Serializable {
 		return type;
 	}
 	
-	public void setURL( URL url ) 
+	public void setURL( String url ) 
 	{
 		this.url = url;
 	}
 	
-	public URL getURL() 
+	public String getURL() 
 	{
 		return url;
 	}
@@ -53,5 +56,13 @@ public class Icon implements Serializable {
 	public boolean isDefault() 
 	{
 		return isDefault;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 }

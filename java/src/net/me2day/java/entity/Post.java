@@ -1,4 +1,4 @@
-package net.me2day.java;
+package net.me2day.java.entity;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -8,12 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.me2day.java.VirtualFile;
 /**
  * 미투 포스트(글)을 나타내는 클래스이다.
  *
  * @author Jang-Ho Hwang, rath@xrath.com 
  */
-public class Post implements Serializable
+public class Post implements Serializable, GWTFriendly
 {
 	private static final long serialVersionUID = 570026228180299315L;
 	
@@ -52,7 +54,7 @@ public class Post implements Serializable
 	private Float latitude;
 	private Float longitude;
 	
-	private VirtualFile attachment;
+	private transient VirtualFile attachment;
 
 	private List<String> tags = new ArrayList<String>(2);
 
@@ -375,5 +377,27 @@ public class Post implements Serializable
 	public int getLength()
 	{
 		return getLengthOf( getBody() );
+	}
+
+	@Override
+	public Object toGWT() {
+		net.me2day.java.gwt.client.Post ret = new net.me2day.java.gwt.client.Post();
+		ret.setAuthor((net.me2day.java.gwt.client.Person) this.author.toGWT());
+		ret.setBody(this.body);
+		ret.setCloseComment(this.closeComment);
+		ret.setCommentsCount(this.commentsCount);
+		ret.setIcon(this.icon.toString());
+		ret.setIconIndex(this.iconIndex);
+		ret.setId(this.id);
+		ret.setKind(this.kind);
+		ret.setLatutude(this.latitude);
+		ret.setLongitude(this.longitude);
+		ret.setMetooCount(this.metooCount);
+		ret.setPermalink(this.permalink.toString());
+		ret.setPubDate(this.pubDate);
+		ret.setReceiveSMS(this.receiveSMS);
+		ret.setTags(this.getTags());
+		ret.setUsername(this.username);
+		return ret;
 	}
 }

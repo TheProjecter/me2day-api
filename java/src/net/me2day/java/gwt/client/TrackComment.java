@@ -1,14 +1,9 @@
-package net.me2day.java;
+package net.me2day.java.gwt.client;
 
 import java.io.Serializable;
 
-/**
- * 
- * @author Jang-Ho Hwang, rath@xrath.com
- */
-public class TrackComment implements Serializable
-{	
-	private static final long serialVersionUID = -8876156197228804187L;
+public class TrackComment implements Serializable {
+	private static final long serialVersionUID = 428241280596278911L;
 	
 	private Post post;
 	private Comment comment;
