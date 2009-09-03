@@ -1,4 +1,4 @@
-package net.me2day.java.entity;
+package net.me2day.entity;
 
 import java.io.Serializable;
 

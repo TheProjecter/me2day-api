@@ -1,4 +1,4 @@
-package net.me2day.java.gwt.client;
+package net.me2day.gwt.client;
 
 import java.io.Serializable;
 import java.util.List;

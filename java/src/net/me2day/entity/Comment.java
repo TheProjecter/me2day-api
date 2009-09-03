@@ -1,4 +1,4 @@
-package net.me2day.java.entity;
+package net.me2day.entity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -63,8 +63,8 @@ public class Comment implements Serializable, GWTFriendly
 	
 	public Object toGWT() 
 	{
-		net.me2day.java.gwt.client.Comment ret = new net.me2day.java.gwt.client.Comment();
-		ret.setAuthor((net.me2day.java.gwt.client.Person) author.toGWT());
+		net.me2day.gwt.client.Comment ret = new net.me2day.gwt.client.Comment();
+		ret.setAuthor((net.me2day.gwt.client.Person) author.toGWT());
 		ret.setBody(body);
 		ret.setId(id);
 		ret.setPubDate(pubDate);

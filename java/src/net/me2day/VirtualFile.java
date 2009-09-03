@@ -1,11 +1,11 @@
-package net.me2day.java;
+package net.me2day;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.me2day.java.event.ProgressListener;
+import net.me2day.event.ProgressListener;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package net.me2day.java;
+package net.me2day;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,15 +26,15 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.me2day.java.entity.Comment;
-import net.me2day.java.entity.Icon;
-import net.me2day.java.entity.Metoo;
-import net.me2day.java.entity.Person;
-import net.me2day.java.entity.Post;
-import net.me2day.java.entity.TrackComment;
-import net.me2day.java.event.ProgressEvent;
-import net.me2day.java.event.ProgressListener;
-import net.me2day.java.util.BASE64;
+import net.me2day.entity.Comment;
+import net.me2day.entity.Icon;
+import net.me2day.entity.Metoo;
+import net.me2day.entity.Person;
+import net.me2day.entity.Post;
+import net.me2day.entity.TrackComment;
+import net.me2day.event.ProgressEvent;
+import net.me2day.event.ProgressListener;
+import net.me2day.util.BASE64;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
