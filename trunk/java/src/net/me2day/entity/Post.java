@@ -379,7 +379,6 @@ public class Post implements Serializable, GWTFriendly
 		return getLengthOf( getBody() );
 	}
 
-	@Override
 	public Object toGWT() {
 		net.me2day.gwt.client.Post ret = new net.me2day.gwt.client.Post();
 		ret.setAuthor((net.me2day.gwt.client.Person) this.author.toGWT());
