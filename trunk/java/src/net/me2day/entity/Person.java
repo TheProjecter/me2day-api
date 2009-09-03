@@ -1,4 +1,4 @@
-package net.me2day.java.entity;
+package net.me2day.entity;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -203,7 +203,7 @@ public class Person implements Serializable, GWTFriendly
 
 	@Override
 	public Object toGWT() {
-		net.me2day.java.gwt.client.Person ret = new net.me2day.java.gwt.client.Person();
+		net.me2day.gwt.client.Person ret = new net.me2day.gwt.client.Person();
 		ret.setDescription(this.description);
 		ret.setFace(this.face.toString());
 		ret.setFriendsCount(this.friendCount);
@@ -214,9 +214,9 @@ public class Person implements Serializable, GWTFriendly
 		ret.setParentId(this.parentId);
 		ret.setRSSDaily(this.rssDaily.toString());
 		
-		List<net.me2day.java.gwt.client.Icon> icons = new ArrayList<net.me2day.java.gwt.client.Icon>(postIcons.size());
+		List<net.me2day.gwt.client.Icon> icons = new ArrayList<net.me2day.gwt.client.Icon>(postIcons.size());
 		for(Icon i : postIcons) 
-			icons.add((net.me2day.java.gwt.client.Icon)i.toGWT());
+			icons.add((net.me2day.gwt.client.Icon)i.toGWT());
 		ret.setPostIcons(icons);
 		return ret;
 	}

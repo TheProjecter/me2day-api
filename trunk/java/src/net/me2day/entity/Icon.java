@@ -1,4 +1,4 @@
-package net.me2day.java.entity;
+package net.me2day.entity;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -66,7 +66,7 @@ public class Icon implements Serializable, GWTFriendly {
 	
 	public Object toGWT() 
 	{
-		net.me2day.java.gwt.client.Icon ret = new net.me2day.java.gwt.client.Icon();
+		net.me2day.gwt.client.Icon ret = new net.me2day.gwt.client.Icon();
 		ret.setDefault(this.isDefault);
 		ret.setDescription(this.description);
 		ret.setIndex(this.index);

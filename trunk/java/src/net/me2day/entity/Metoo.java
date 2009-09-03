@@ -1,4 +1,4 @@
-package net.me2day.java.entity;
+package net.me2day.entity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -40,10 +40,10 @@ public class Metoo implements Serializable, GWTFriendly
 		return this.author;
 	}
 	
-	public net.me2day.java.gwt.client.Metoo toGWT() 
+	public net.me2day.gwt.client.Metoo toGWT() 
 	{
-		net.me2day.java.gwt.client.Metoo ret = new net.me2day.java.gwt.client.Metoo();
-		ret.setAuthor((net.me2day.java.gwt.client.Person) this.author.toGWT());
+		net.me2day.gwt.client.Metoo ret = new net.me2day.gwt.client.Metoo();
+		ret.setAuthor((net.me2day.gwt.client.Person) this.author.toGWT());
 		ret.setPubDate(this.pubDate);
 		return ret;
 	}

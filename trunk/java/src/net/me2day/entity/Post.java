@@ -1,11 +1,23 @@
-package net.me2day.java.gwt.client;
+package net.me2day.entity;
 
+import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class Post {
+import net.me2day.VirtualFile;
+/**
+ * 미투 포스트(글)을 나타내는 클래스이다.
+ *
+ * @author Jang-Ho Hwang, rath@xrath.com 
+ */
+public class Post implements Serializable, GWTFriendly
+{
+	private static final long serialVersionUID = 570026228180299315L;
 	
 	// pre-defined icons
 	public static final int ICON_THINK = 1;
@@ -25,11 +37,11 @@ public class Post {
 	
 	private String id;
 	private String username;
-	private String permalink;
+	private URL permalink;
 	private String body;
 	private Date pubDate;
 	private String kind;
-	private String icon;
+	private URL icon;
 	private int iconIndex;
 	private Person author;
 
@@ -42,6 +54,8 @@ public class Post {
 	private Float latitude;
 	private Float longitude;
 	
+	private transient VirtualFile attachment;
+
 	private List<String> tags = new ArrayList<String>(2);
 
 	/**
@@ -75,7 +89,7 @@ public class Post {
 	/**
 	 * 이 포스트의 퍼머링크를 지정한다.
 	 */
-	public void setPermalink( String link )
+	public void setPermalink( URL link )
 	{
 		this.permalink = link;
 	}
@@ -83,7 +97,7 @@ public class Post {
 	/**
 	 * 이 포스트의 퍼머링크를 가져온다.
 	 */
-	public String getPermalink()
+	public URL getPermalink()
 	{
 		return this.permalink;
 	}
@@ -111,12 +125,12 @@ public class Post {
 		return this.body;
 	}
 
-	public void setIcon( String iconString )
+	public void setIcon( URL iconUrl )
 	{
-		this.icon = iconString;
+		this.icon = iconUrl;
 	}
 
-	public String getIcon()
+	public URL getIcon()
 	{
 		return this.icon;
 	}
@@ -294,6 +308,22 @@ public class Post {
 	{
 		return longitude;
 	}
+
+	/**
+	 * 첨부파일을 가져온다.
+	 */
+	public VirtualFile getAttachment() 
+	{
+		return attachment;
+	}
+	
+	/**
+	 * 첨부파일을 설정한다.
+	 */
+	public void setAttachment( VirtualFile attachment ) 
+	{
+		this.attachment = attachment;
+	}
 	
 	/**
 	 * 미투데이 링크 형식을 제외한 본문을 반환한다.
@@ -302,32 +332,19 @@ public class Post {
 	 * @return 링크를 제외한 본문
 	 */
 	public static String getPlainBodyOf( String content ) {
-		
-		String regex = ".*\"([^\"]*)\":(https?://[^\\s]*).*";
-		
-		// 1. check matches.
-		// 2. if so.. find 1st and 2nd index of double quote.
-		// 3. find space(0x20) after 2nd double quote.
-		// 4. make it while no pattern matched.
-		
-		int offset = 0;
-		while( content.matches(regex) )
-		{ 
-			int i1 = content.indexOf("\":http", offset);
-			int i0 = content.lastIndexOf("\"", i1-1);
-			
-			String text = content.substring(i0+1, i1);
-			int i2 = content.indexOf(" ", i1+1);
-			if( i2==-1 )
-				i2 = content.length() - 1;
-			
-			int oldLength = content.length();
-			content = content.substring(0, i0) + text + content.substring(i2+1);
-			i2 -= oldLength - content.length();
-			offset = i2 + 1;
+		String regex = "\"([^\"]*)\":(https?://[^\\s]*)";
+		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(content);
+
+		StringBuffer message = new StringBuffer();
+
+		while (m.find()) {
+			m.appendReplacement(message, m.group(1));
 		}
-				
-		return content;
+
+		m.appendTail(message);
+		
+		return message.toString();
 	}
 	
 	/**
@@ -361,5 +378,26 @@ public class Post {
 	{
 		return getLengthOf( getBody() );
 	}
-	
+
+	@Override
+	public Object toGWT() {
+		net.me2day.gwt.client.Post ret = new net.me2day.gwt.client.Post();
+		ret.setAuthor((net.me2day.gwt.client.Person) this.author.toGWT());
+		ret.setBody(this.body);
+		ret.setCloseComment(this.closeComment);
+		ret.setCommentsCount(this.commentsCount);
+		ret.setIcon(this.icon.toString());
+		ret.setIconIndex(this.iconIndex);
+		ret.setId(this.id);
+		ret.setKind(this.kind);
+		ret.setLatutude(this.latitude);
+		ret.setLongitude(this.longitude);
+		ret.setMetooCount(this.metooCount);
+		ret.setPermalink(this.permalink.toString());
+		ret.setPubDate(this.pubDate);
+		ret.setReceiveSMS(this.receiveSMS);
+		ret.setTags(this.getTags());
+		ret.setUsername(this.username);
+		return ret;
+	}
 }
