@@ -1,13 +1,14 @@
-package net.me2day.java;
+package net.me2day.java.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+
 /**
  *
  * @author Jang-Ho Hwang, rath@xrath.com
  * @version 1.0
  */
-public class Comment implements Serializable
+public class Comment implements Serializable, GWTFriendly
 {
 	private static final long serialVersionUID = -1461352834498546885L;
 	private String id;
@@ -58,5 +59,15 @@ public class Comment implements Serializable
 	public Person getAuthor()
 	{
 		return this.author;
+	}
+	
+	public Object toGWT() 
+	{
+		net.me2day.java.gwt.client.Comment ret = new net.me2day.java.gwt.client.Comment();
+		ret.setAuthor((net.me2day.java.gwt.client.Person) author.toGWT());
+		ret.setBody(body);
+		ret.setId(id);
+		ret.setPubDate(pubDate);
+		return ret;
 	}
 }

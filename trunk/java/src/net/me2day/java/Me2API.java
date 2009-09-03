@@ -26,6 +26,12 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.me2day.java.entity.Comment;
+import net.me2day.java.entity.Icon;
+import net.me2day.java.entity.Metoo;
+import net.me2day.java.entity.Person;
+import net.me2day.java.entity.Post;
+import net.me2day.java.entity.TrackComment;
 import net.me2day.java.event.ProgressEvent;
 import net.me2day.java.event.ProgressListener;
 import net.me2day.java.util.BASE64;
@@ -864,6 +870,22 @@ public class Me2API {
 		ret.setRSSDaily(new URL(getTextAsName(e, "rssDaily")));
 		ret.setParentId(getTextAsName(e, "invitedBy"));
 		ret.setFriendsCount(Integer.parseInt(getTextAsName(e, "friendsCount")));
+		
+		// postIcons
+		NodeList iconList = e.getElementsByTagName("postIcon");
+		List<Icon> icons = new ArrayList<Icon>();
+		for(int i=0; i<iconList.getLength(); i++) {
+			Element iconElement = (Element)iconList.item(i);			
+			Icon icon = new Icon();
+			icon.setIndex(Integer.parseInt(getTextAsName(iconElement, "iconIndex")));
+			icon.setType(Integer.parseInt(getTextAsName(iconElement, "iconType")));
+			icon.setDescription(getTextAsName(iconElement, "description"));
+			icon.setURL(new URL(getTextAsName(iconElement, "url")));
+			icon.setDefault(Boolean.getBoolean(getTextAsName(iconElement, "default")));
+			icons.add(icon);
+		}
+		ret.setPostIcons(icons);
+		
 		return ret;
 	}
 }

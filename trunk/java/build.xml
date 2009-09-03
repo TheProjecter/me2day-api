@@ -32,6 +32,9 @@
 	</target>
 
 	<target name="build" depends="compile">
+        <copy todir="${build}">
+            <fileset dir="${src}" includes="net/me2day/java/gwt/client/**/*.java,**/*.xml" />
+        </copy>
 		<jar jarfile="${MainJar}"
 			basedir="${build}"
 			compress="yes">

@@ -1,13 +1,16 @@
-package net.me2day.java;
+package net.me2day.java.entity;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 미투데이 이용자를 나타내는 클래스이다.
  *
  * @author Jang-Ho Hwang, rath@xrath.com 
  */
-public class Person implements Serializable
+public class Person implements Serializable, GWTFriendly
 {
 	private static final long serialVersionUID = 8999736931097933667L;
 	
@@ -20,6 +23,8 @@ public class Person implements Serializable
 	private URL rssDaily;
 	private String parentId;
 	private int friendCount;
+	
+	private List<Icon> postIcons;
 
 	/**
 	 * Person 객체를 생성한다.
@@ -176,5 +181,43 @@ public class Person implements Serializable
 	public int getFriendsCount()
 	{
 		return this.friendCount;
+	}
+
+	/**
+	 * 이 사람의 포스팅 아이콘 세트를 지정한다. 
+	 * 
+	 * @param postIcons 아이콘 목록.
+	 */
+	public void setPostIcons(List<Icon> postIcons) {
+		this.postIcons = postIcons;
+	}
+
+	/**
+	 * 이 사람의 포스팅 아이콘 세트를 가져온다. 
+	 * 
+	 * @return 아이콘 목록.
+	 */
+	public List<Icon> getPostIcons() {
+		return postIcons;
+	}
+
+	@Override
+	public Object toGWT() {
+		net.me2day.java.gwt.client.Person ret = new net.me2day.java.gwt.client.Person();
+		ret.setDescription(this.description);
+		ret.setFace(this.face.toString());
+		ret.setFriendsCount(this.friendCount);
+		ret.setHomepage(this.homepage.toString());
+		ret.setId(this.id);
+		ret.setNickname(this.nickname);
+		ret.setOpenId(this.openid.toString());
+		ret.setParentId(this.parentId);
+		ret.setRSSDaily(this.rssDaily.toString());
+		
+		List<net.me2day.java.gwt.client.Icon> icons = new ArrayList<net.me2day.java.gwt.client.Icon>(postIcons.size());
+		for(Icon i : postIcons) 
+			icons.add((net.me2day.java.gwt.client.Icon)i.toGWT());
+		ret.setPostIcons(icons);
+		return ret;
 	}
 }
