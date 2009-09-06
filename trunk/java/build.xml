@@ -14,8 +14,6 @@
 			encoding="utf-8"
 			debug="yes"
 			source="1.5" target="1.5">
-			<classpath>
-			</classpath>
 		</javac>
 	</target>
 

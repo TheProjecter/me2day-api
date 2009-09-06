@@ -203,10 +203,13 @@ public class Person implements Serializable, GWTFriendly
 
 	public Object toGWT() {
 		net.me2day.gwt.client.Person ret = new net.me2day.gwt.client.Person();
+		if( this.description!=null )
 		ret.setDescription(this.description);
-		ret.setFace(this.face.toString());
+		if( this.face!=null )
+			ret.setFace(this.face.toString());
 		ret.setFriendsCount(this.friendCount);
-		ret.setHomepage(this.homepage.toString());
+		if( this.homepage!=null )
+			ret.setHomepage(this.homepage.toString());
 		ret.setId(this.id);
 		ret.setNickname(this.nickname);
 		if( this.openid!=null ) 
