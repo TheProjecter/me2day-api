@@ -880,7 +880,11 @@ public class Me2API {
 			Element iconElement = (Element)iconList.item(i);			
 			Icon icon = new Icon();
 			icon.setIndex(Integer.parseInt(getTextAsName(iconElement, "iconIndex")));
-			icon.setType(Integer.parseInt(getTextAsName(iconElement, "iconType")));
+			try {
+				icon.setType(Integer.parseInt(getTextAsName(iconElement, "iconType")));
+			} catch( NumberFormatException ne ) {
+				icon.setType(1);
+			}
 			icon.setDescription(getTextAsName(iconElement, "description"));
 			icon.setURL(new URL(getTextAsName(iconElement, "url")));
 			icon.setDefault(Boolean.getBoolean(getTextAsName(iconElement, "default")));
