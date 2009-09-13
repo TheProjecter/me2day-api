@@ -8,7 +8,7 @@ import httplib, urllib
 import base64, md5, random
 from datetime import datetime
 
-import libxml2
+import simplejson
 
 class Post:
     def __init__(self):
@@ -79,13 +79,8 @@ class me2API:
                 raise Error("%d %s" % (res.status, res.reason))
             data = res.read()
             if processor:
-                doc = libxml2.parseDoc(data)
-                ctx = doc.xpathNewContext()
-                try:
-                    ret = processor(ctx)
-                finally:
-                    ctx.xpathFreeContext()
-                    doc.freeDoc()
+                json = simplejson.loads(data)
+                ret = processor(json)
         finally:
             con.close()
         return ret
@@ -103,106 +98,90 @@ class me2API:
                 raise Error("%d %s" % (res.status, res.reason))
             data = res.read()
             if processor:
-                doc = libxml2.parseDoc(data)
-                ctx = doc.xpathNewContext()
-                try:
-                    ret = processor(ctx)
-                finally:
-                    ctx.xpathFreeContext()
-                    doc.freeDoc()
+                ret = processor(simplejson.loads(data))
         finally:
             con.close()
         return ret
         
-    def _process_get_posts(self, ctx):
-        posts = ctx.xpathEval("//post")
-
+    def _process_get_posts(self, json):
         ret = []
-        f = lambda post, eval: post.xpathEval(eval + "/text()")[0].content
-        for post in posts:
+        for post in json:
             p = Post()
-            p.id = f(post, "./post_id")
-            p.permalink = f(post, "./permalink")
-            p.body = f(post, "./body")
-            p.body_as_text = f(post, "./textBody")
-            p.metoo_count = int(f(post, "./metooCount"))
-            p.comment_count = int(f(post, "./commentsCount"))
-            p.date = datetime.strptime(f(post, "./pubDate")[:-5], "%Y-%m-%dT%H:%M:%S")
-            p.tags = map(lambda x: x.content, post.xpathEval("./tags/tag/name/text()"))
+            p.id = post['post_id']
+            p.permalink = post['permalink']
+            p.body = post['body']
+            p.body_as_text = post['textBody']
+            p.metoo_count = post['metooCount']
+            p.comment_count = post['commentsCount']
+            p.date = datetime.strptime(post['pubDate'][:-5], "%Y-%m-%dT%H:%M:%S")
+            p.tags = post['tagText'].split(' ')
             
             author = Person()
-            author.id = f(post, "./author/id")
-            author.nickname = f(post, "./author/nickname")
-            author.me2day_home = f(post, "./author/me2dayHome")
-            author.face = f(post, "./author/face")
+            author.id = post['author']['id']
+            author.nickname = post['author']['nickname']
+            author.me2day_home = post['author']['me2dayHome']
+            author.face = post['author']['face']
             p.author = author
             ret.append(p)
         return ret
 
-    def _process_get_comments(self, ctx):
-        comments = ctx.xpathEval("//comment")
+    def _process_get_comments(self, json):
         ret = []
-        f = lambda post, eval: post.xpathEval(eval + "/text()")[0].content
-        for cmt in comments:
+        for cmt in json['comments']:
             c = Comment()
-            c.id = f(cmt, "./commentId")
-            c.body = f(cmt, "./body")
-            c.date = datetime.strptime(f(cmt, "./pubDate")[:-5], "%Y-%m-%dT%H:%M:%S")
+            c.id = cmt['commentId']
+            c.body = cmt['body']
+            c.date = datetime.strptime(cmt['pubDate'][:-5], "%Y-%m-%dT%H:%M:%S")
 
             author = Person()
-            author.id = f(cmt, "./author/id")
-            author.nickname = f(cmt, "./author/nickname")
-            author.face = f(cmt, "./author/face")
-            author.me2day_home = f(cmt, "./author/me2dayHome")
+            author.id = cmt['author']['id']
+            author.nickname = cmt['author']['nickname']
+            author.face = cmt['author']['face']
+            author.me2day_home = cmt['author']['me2dayHome']
             c.author = author
             ret.append(c)
         return ret
 
-    def _process_get_friends(self, ctx):
-        friends = ctx.xpathEval("//person")
+    def _process_get_friends(self, json):
         ret = []
-        f = lambda p, eval: p.xpathEval(eval + "/text()")[0].content
-        for friend in friends:
+        for f in json['friends']:
             p = Person()    
-            p.id = f(friend, "./id")
-            p.nickname = f(friend, "./nickname")
-            p.face = f(friend, "./face")
-            p.me2day_home = f(friend, "./me2dayHome")
-            p.friends_count = f(friend, "./friendsCount")
-            p.updated = f(friend, "./updated")
+            p.id = f['id']
+            p.nickname = f['nickname']
+            p.face = f['face']
+            p.me2dayHome = f['me2dayHome']
+            p.friendsCount = f['friendsCount']
+            p.updated = f['updated']
             ret.append(p)
         return ret
 
-    def _process_get_metoos(self, ctx):
-        metoos = ctx.xpathEval("//metoo")
+    def _process_get_metoos(self, json):
         ret = []
-        f = lambda p, eval: p.xpathEval(eval + "/text()")[0].content
-        for metoo in metoos:
+        for m in json['metoos']:
             p = Person()
-            p.id = f(metoo, "./author/id")
-            p.nickname = f(metoo, "./author/nickname")
-            p.face = f(metoo, "./author/face")
-            p.me2day_home = f(metoo, "./author/me2dayHome")
-            ret.append( (p, f(metoo, "./pubDate")) )
+            p.id = m['author']['id']
+            p.nickname = m['author']['nickname']
+            p.face = m['author']['face']
+            p.me2day_home = m['author']['me2dayHome']
+
+            ret.append( (p, m['pubDate']) )
         return ret
 
-    def _process_metoo(self, ctx):
-        e = ctx.xpathEval("//error")
-        f = lambda p, eval: p.xpathEval(eval + "/text()")[0].content
-        return (int(f(e, "./code")), f(e, "./message"), f(e, "./description"))
+    def _process_metoo(self, json):
+        return (json['code'], json['message'], json['description'])
 
     def get_posts(self, params={}, username=None):
         if not username:
             username = self.username
         querystring = urllib.urlencode(params)
-        return self._get("/api/get_posts/%s.xml?%s" % (username, querystring), 
+        return self._get("/api/get_posts/%s.json?%s" % (username, querystring), 
             self._process_get_posts)
 
     def get_comments(self, params={}, username=None):
         if not username:
             username = self.username
         querystring = urllib.urlencode(params)
-        return self._get("/api/get_comments/%s.xml?%s" % (username, querystring),
+        return self._get("/api/get_comments/%s.json?%s" % (username, querystring),
             self._process_get_comments)
 
     def create_comment(self, params={}, username=None):
@@ -211,7 +190,7 @@ class me2API:
         """
         if not username and not self.username:
             raise Error('username and userkey must be set')
-        return self._post("/api/create_comment.xml", None, params)
+        return self._post("/api/create_comment.json", None, params)
 
     def create_post(self, params={}, username=None):
         """
@@ -224,7 +203,7 @@ class me2API:
         """
         if not username and not self.username:
             raise Error('username and userkey must be set')
-        return self._post("/api/create_post.xml", None, params)
+        return self._post("/api/create_post.json", None, params)
 
     def get_friends(self, params={}, username=None):
         """
@@ -240,7 +219,7 @@ class me2API:
         if not username:
             username = self.username
         querystring = urllib.urlencode(params)
-        return self._get("/api/get_friends/%s.xml?%s" % (username, querystring), 
+        return self._get("/api/get_friends/%s.json?%s" % (username, querystring), 
             self._process_get_friends)
 
     def get_metoos(self, params={}):
@@ -249,7 +228,7 @@ class me2API:
         * post_id: id of the post.
         """
         querystring = urllib.urlencode(params)
-        return self._get("/api/get_metoos.xml?%s" % querystring, self._process_get_metoos)
+        return self._get("/api/get_metoos.json?%s" % querystring, self._process_get_metoos)
 
     def metoo(self, params={}, username=None):
         """
@@ -259,13 +238,13 @@ class me2API:
         if not username and not self.username:
             raise Error('username and userkey must be set')
         querystring = urllib.urlencode(params)
-        return self._get("/api/metoo.xml?%s" % querystring, self._process_metoo)
+        return self._get("/api/metoo.json?%s" % querystring, self._process_metoo)
 
     def noop(self):
         """
         No operation. but test your authentication.
         """
-        return self._get("/api/noop.xml")
+        return self._get("/api/noop.json")
 
 class Error(Exception):
     pass
