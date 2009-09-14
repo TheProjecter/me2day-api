@@ -8,7 +8,7 @@ import httplib, urllib
 import base64, md5, random
 from datetime import datetime
 
-import simplejson
+import json
 
 class Post:
     def __init__(self):
@@ -70,7 +70,7 @@ class me2API:
         return base64.b64encode("%s:%s%s" % (id, nonce, md5.md5(nonce+pw).hexdigest()))
 
     def _get(self, uri, processor=None, params={}):
-        con = httplib.HTTPConnection(self.HOST)
+        con = httplib.HTTPConnection(self.HOST, 80, timeout=10)
         ret = None
         try:
             con.request("GET", uri, urllib.urlencode(params), self.headers)
@@ -79,14 +79,13 @@ class me2API:
                 raise Error("%d %s" % (res.status, res.reason))
             data = res.read()
             if processor:
-                json = simplejson.loads(data)
-                ret = processor(json)
+                ret = processor(json.loads(data))
         finally:
             con.close()
         return ret
 
     def _post(self, uri, processor=None, params={}):
-        con = httplib.HTTPConnection(self.HOST)
+        con = httplib.HTTPConnection(self.HOST, 80, timeout=10)
         head = self.headers
         head['Content-Type'] = 'application/x-www-form-urlencoded'
 
@@ -98,14 +97,14 @@ class me2API:
                 raise Error("%d %s" % (res.status, res.reason))
             data = res.read()
             if processor:
-                ret = processor(simplejson.loads(data))
+                ret = processor(json.loads(data))
         finally:
             con.close()
         return ret
         
-    def _process_get_posts(self, json):
+    def _process_get_posts(self, json_data):
         ret = []
-        for post in json:
+        for post in json_data:
             p = Post()
             p.id = post['post_id']
             p.permalink = post['permalink']
@@ -114,7 +113,7 @@ class me2API:
             p.metoo_count = post['metooCount']
             p.comment_count = post['commentsCount']
             p.date = datetime.strptime(post['pubDate'][:-5], "%Y-%m-%dT%H:%M:%S")
-            p.tags = post['tagText'].split(' ')
+            p.tags = filter(lambda x: len(x) > 0, post['tagText'].split(' '))
             
             author = Person()
             author.id = post['author']['id']
@@ -125,9 +124,9 @@ class me2API:
             ret.append(p)
         return ret
 
-    def _process_get_comments(self, json):
+    def _process_get_comments(self, json_data):
         ret = []
-        for cmt in json['comments']:
+        for cmt in json_data['comments']:
             c = Comment()
             c.id = cmt['commentId']
             c.body = cmt['body']
@@ -142,9 +141,9 @@ class me2API:
             ret.append(c)
         return ret
 
-    def _process_get_friends(self, json):
+    def _process_get_friends(self, json_data):
         ret = []
-        for f in json['friends']:
+        for f in json_data['friends']:
             p = Person()    
             p.id = f['id']
             p.nickname = f['nickname']
@@ -155,9 +154,9 @@ class me2API:
             ret.append(p)
         return ret
 
-    def _process_get_metoos(self, json):
+    def _process_get_metoos(self, json_data):
         ret = []
-        for m in json['metoos']:
+        for m in json_data['metoos']:
             p = Person()
             p.id = m['author']['id']
             p.nickname = m['author']['nickname']
@@ -167,8 +166,8 @@ class me2API:
             ret.append( (p, m['pubDate']) )
         return ret
 
-    def _process_metoo(self, json):
-        return (json['code'], json['message'], json['description'])
+    def _process_metoo(self, json_data):
+        return (json_data['code'], json_data['message'], json_data['description'])
 
     def get_posts(self, params={}, username=None):
         if not username:
