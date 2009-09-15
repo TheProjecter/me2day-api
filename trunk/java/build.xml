@@ -43,7 +43,7 @@
 		<mkdir dir="${dist}"/>
 		<tar tarfile="${dist}/me2api-java-src.tar"
 			basedir="."
-			excludes="**/.svn/**, test.*, build, build/**, dist, dist/**"/>
+			excludes="**/.svn/**, test.*, build, build/**, dist, dist/**, *.sh"/>
 		<gzip src="${dist}/me2api-java-src.tar"
 			zipfile="${dist}/me2api-java-src.tar.gz"/>
 		<delete file="${dist}/me2api-java-src.tar"/>
