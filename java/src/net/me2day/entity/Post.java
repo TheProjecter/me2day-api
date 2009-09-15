@@ -339,7 +339,8 @@ public class Post implements Serializable, GWTFriendly
 		StringBuffer message = new StringBuffer();
 
 		while (m.find()) {
-			m.appendReplacement(message, m.group(1));
+			String toReplace = m.group(1).replace("$", "\\$");
+			m.appendReplacement(message, toReplace);
 		}
 
 		m.appendTail(message);
