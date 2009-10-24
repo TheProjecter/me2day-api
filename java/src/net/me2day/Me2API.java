@@ -226,6 +226,10 @@ public class Me2API {
 			params.put("longitude", String.valueOf(post.getLongitude()));
 			params.put("latitude", String.valueOf(post.getLatitude()));
 		}
+		if( post.getContentType()!=null ) 
+			params.put("content_type", post.getContentType());
+		if( post.getCallbackUrl()!=null ) 
+			params.put("callback_url", post.getCallbackUrl());
 
 		Document doc = null;
 		if (post.getAttachment() != null ) {
@@ -869,9 +873,9 @@ public class Me2API {
 		if (homepage != null && homepage.startsWith("http://"))
 			ret.setHomepage(new URL(homepage));
 		ret.setDescription(getTextAsName(e, "description"));
-		ret.setRSSDaily(new URL(getTextAsName(e, "rssDaily")));
+		ret.setRssDaily(new URL(getTextAsName(e, "rssDaily")));
 		ret.setParentId(getTextAsName(e, "invitedBy"));
-		ret.setFriendsCount(Integer.parseInt(getTextAsName(e, "friendsCount")));
+		ret.setFriendCount(Integer.parseInt(getTextAsName(e, "friendsCount")));
 		
 		// postIcons
 		NodeList iconList = e.getElementsByTagName("postIcon");
@@ -888,6 +892,7 @@ public class Me2API {
 			icon.setDescription(getTextAsName(iconElement, "description"));
 			icon.setURL(new URL(getTextAsName(iconElement, "url")));
 			icon.setDefault(Boolean.getBoolean(getTextAsName(iconElement, "default")));
+
 			icons.add(icon);
 		}
 		ret.setPostIcons(icons);

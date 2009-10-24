@@ -44,7 +44,7 @@ public class Post implements Serializable, GWTFriendly
 	private URL icon;
 	private int iconIndex;
 	private Person author;
-
+	
 	private int commentsCount;
 	private int metooCount;
 	
@@ -55,6 +55,9 @@ public class Post implements Serializable, GWTFriendly
 	private Float longitude;
 	
 	private transient VirtualFile attachment;
+	
+	private String contentType;
+	private String callbackUrl;
 
 	private List<String> tags = new ArrayList<String>(2);
 
@@ -398,6 +401,24 @@ public class Post implements Serializable, GWTFriendly
 		ret.setReceiveSMS(this.receiveSMS);
 		ret.setTags(this.getTags());
 		ret.setUsername(this.username);
+		ret.setContentType(this.contentType);
+		ret.setCallbackUrl(this.callbackUrl);
 		return ret;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setCallbackUrl(String callbackUrl) {
+		this.callbackUrl = callbackUrl;
+	}
+
+	public String getCallbackUrl() {
+		return callbackUrl;
 	}
 }

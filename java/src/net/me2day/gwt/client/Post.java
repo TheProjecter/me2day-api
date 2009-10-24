@@ -43,6 +43,9 @@ public class Post {
 	private Float longitude;
 	
 	private List<String> tags = new ArrayList<String>(2);
+	
+	private String contentType;
+	private String callbackUrl;
 
 	/**
 	 * 새로운 Post 객체를 만든다.
@@ -360,6 +363,22 @@ public class Post {
 	public int getLength()
 	{
 		return getLengthOf( getBody() );
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setCallbackUrl(String callbackUrl) {
+		this.callbackUrl = callbackUrl;
+	}
+
+	public String getCallbackUrl() {
+		return callbackUrl;
 	}
 	
 }

@@ -3,12 +3,14 @@ package net.me2day.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 /**
  * 
  *
  * @author Jang-Ho Hwang, rath@xrath.com 
  */
-public class Metoo implements Serializable, GWTFriendly
+public @Data class Metoo implements Serializable, GWTFriendly
 {
 	private static final long serialVersionUID = 4495373535109985874L;
 	
@@ -20,26 +22,6 @@ public class Metoo implements Serializable, GWTFriendly
 
 	}
 
-	public void setPubDate( Date pubDate )
-	{
-		this.pubDate = pubDate;
-	}
-
-	public Date getPubDate()
-	{
-		return this.pubDate;
-	}
-
-	public void setAuthor( Person author )
-	{
-		this.author = author;
-	}
-
-	public Person getAuthor()
-	{
-		return this.author;
-	}
-	
 	public net.me2day.gwt.client.Metoo toGWT() 
 	{
 		net.me2day.gwt.client.Metoo ret = new net.me2day.gwt.client.Metoo();
