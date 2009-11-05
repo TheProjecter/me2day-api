@@ -14,6 +14,9 @@
 			encoding="utf-8"
 			debug="yes"
 			source="1.5" target="1.5">
+            <classpath>
+                <path location="lib/lombok.jar" />
+            </classpath>
 		</javac>
 	</target>
 
