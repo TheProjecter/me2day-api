@@ -2,6 +2,7 @@ package net.me2day.entity;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,17 @@ public @Data class Person implements Serializable, GWTFriendly
 	 * 포스트 아이콘 목록.
 	 */
 	protected List<Icon> postIcons;
+
+	/**
+	 * 이 사용자의 미투데이 페이지.
+	 */
+	public URL getMe2dayHome() {
+		URL url = null;
+		try {
+			url = new URL("http://me2day.net/" + this.id);
+		} catch( MalformedURLException e ) {}
+		return url;
+	}
 
 
 	public Object toGWT() {
