@@ -782,6 +782,12 @@ public class Me2API {
 				comment.setPubDate(fmtDate.parse(date));
 			} catch (ParseException ex) {
 			}
+			
+			Person author = new Person();
+			author.setId(getTextAsName(ec, "id"));
+			author.setNickname(getTextAsName(ec, "nickname"));
+			author.setFace(new URL(getTextAsName(ec, "face")));
+			comment.setAuthor(author);
 
 			TrackComment tc = new TrackComment();
 			tc.setPost(post);
