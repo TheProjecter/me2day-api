@@ -292,7 +292,7 @@ public class Me2API {
 				if (value instanceof String) {
 					out.write(newLineBytes);
 					out.write(newLineBytes);
-					out.write(String.valueOf(value).getBytes());
+					out.write(String.valueOf(value).getBytes("UTF-8"));
 					out.write(newLineBytes);
 				} else if (value instanceof VirtualFile) {
 					VirtualFile file = (VirtualFile)value;
@@ -300,7 +300,7 @@ public class Me2API {
 					try {
 						out.write(fileNameBytes);
 						out.write(quotationBytes);
-						out.write(file.getName().getBytes());
+						out.write(file.getName().getBytes("UTF-8"));
 						out.write(quotationBytes);
 						out.write(newLineBytes);
 						out.write(contentTypeBytes);
