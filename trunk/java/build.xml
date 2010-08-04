@@ -23,15 +23,26 @@
 	<target name="javadoc" depends="compile">
 		<mkdir dir="${apidocs}"/>
 		<javadoc sourcepath="${src}"
-			encoding="utf-8"
-			docencoding="utf-8"
-			packagenames="net.me2day.*"
+			locale="ko_KR"
+			charset="UTF-8"
+			encoding="UTF-8"
+			docencoding="UTF-8"
+			packagenames="net.*"
 			destdir="${apidocs}"
-			link="http://java.sun.com/j2se/1.5.0/docs/api"
 			splitindex="yes">
             <classpath>
                 <path location="lib/lombok.jar" />
             </classpath>
+			<link href="http://java.sun.com/javase/6/docs/api/" />
+			<!--
+            <doclet name="org.umlgraph.doclet.UmlGraphDoc" path="../../webwork/UmlGraph.jar">
+                <param name="-operations" />    
+                <param name="-qualify" />   
+                <param name="-types" /> 
+                <param name="-visibility" />    
+                <param name="-collpackages" />  
+            </doclet>
+			-->
 		</javadoc>
 	</target>
 
@@ -49,7 +60,7 @@
 		<mkdir dir="${dist}"/>
 		<tar tarfile="${dist}/me2api-java-src.tar"
 			basedir="."
-			excludes="**/.svn/**, test.*, build, build/**, dist, dist/**, *.sh"/>
+			excludes="**/.svn/**, test.*, build, build/**, dist, dist/**, *.sh, **/Test.*"/>
 		<gzip src="${dist}/me2api-java-src.tar"
 			zipfile="${dist}/me2api-java-src.tar.gz"/>
 		<delete file="${dist}/me2api-java-src.tar"/>
